@@ -1,4 +1,4 @@
-package com.tm.books;
+package com.tm.tvshows;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class BooksApplicationTests {
+public class TVShowsApplicationTests {
 
 	@Test
 	public void contextLoads() {
