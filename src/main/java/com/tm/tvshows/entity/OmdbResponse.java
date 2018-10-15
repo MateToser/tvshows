@@ -54,4 +54,12 @@ public class OmdbResponse {
 	@JsonProperty("Response")
 	private String response;
 
+	public Double getImdbRatingInDouble() {
+		return Double.parseDouble(imdbRating);
+	}
+
+	public Long getSeasonsInLong() {
+		return Long.parseLong(totalSeasons);
+	}
+
 }

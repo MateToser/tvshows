@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -37,7 +36,7 @@ public class Show implements Serializable {
 	 *
 	 */
 	@Transient
-	private static final long serialVersionUID = -6329299582298325422L;
+	private static final long serialVersionUID = 8468288151787024438L;
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -53,19 +52,48 @@ public class Show implements Serializable {
 	private String description;
 
 	@JsonView(View.Public.class)
-	@Column(name = "rating", nullable = false)
-	private Integer rating;
+	@Column(name = "released", length = 20, nullable = false)
+	private String released;
+
+	@JsonView(View.Public.class)
+	@Column(name = "writer", length = 30, nullable = false)
+	private String writer;
+
+	@JsonView(View.Public.class)
+	@Column(name = "awards", length = 255, nullable = false)
+	private String awards;
+
+	@JsonView(View.Public.class)
+	@Column(name = "seasons", nullable = false)
+	private Long seasons;
+
+	@JsonView(View.Public.class)
+	@Column(name = "imdb_rating", nullable = false)
+	private Double imdbRating;
+
+	@JsonView(View.Public.class)
+	@Column(name = "imdb_votes", nullable = false)
+	private String imdbVotes;
+
+	@JsonView(View.Public.class)
+	@Column(name = "imdb_id", nullable = false)
+	private String imdbId;
 
 	@JsonView(View.Public.class)
 	@Column(name = "approved", columnDefinition = "TINYINT DEFAULT 0")
 	private Boolean approved;
+
+	@JsonView(View.Public.class)
+	@Column(name = "poster_url", length = 2000, nullable = false)
+	private String posterUrl;
 
 	@JsonView(View.Show.class)
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinTable(name = "show_user", joinColumns = @JoinColumn(name = "show_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
 	private Set<User> users;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-	@JoinColumn(name = "category_id", nullable = false)
-	private Category category;
+	@JsonView(View.Show.class)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	@JoinTable(name = "show_category", joinColumns = @JoinColumn(name = "show_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
+	private Set<Category> categories;
 }

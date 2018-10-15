@@ -9,7 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -45,6 +45,6 @@ public class Category implements Serializable {
 	private String type;
 
 	@JsonView(View.Category.class)
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
+	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "categories")
 	private Set<Show> shows;
 }
