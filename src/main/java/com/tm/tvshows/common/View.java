@@ -18,4 +18,8 @@ public interface View {
 
 	}
 
+	public static class Role extends Public {
+
+	}
+
 }

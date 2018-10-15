@@ -5,30 +5,27 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.tm.tvshows.common.Role;
 import com.tm.tvshows.common.View;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "user")
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = { "email" }))
 @EqualsAndHashCode(of = "id")
 public class User implements Serializable {
 
@@ -36,13 +33,25 @@ public class User implements Serializable {
 	 *
 	 */
 	@Transient
-	private static final long serialVersionUID = -5070583730435929792L;
+	private static final long serialVersionUID = -153164493995962273L;
+
+	public User() {
+
+	}
+
+	public User(@Email String email, String firstName, String lastName, String password) {
+		this.email = email;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.password = password;
+	}
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	@Id
 	private Integer id;
 
+	@Email
 	@JsonView(View.Public.class)
 	@Column(name = "email", length = 50, nullable = false)
 	private String email;
@@ -55,15 +64,19 @@ public class User implements Serializable {
 	@Column(name = "last_name", length = 30, nullable = false)
 	private String lastName;
 
-	@Column(name = "password_hash", length = 255, nullable = false)
-	private String passwordHash;
+	@Column(name = "password", length = 255, nullable = false)
+	private String password;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "role", nullable = false)
-	private Role role;
+	@JsonView(View.Role.class)
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+	private Set<Role> roles;
 
 	@JsonView(View.User.class)
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
 	private Set<Show> shows;
 
+	public String getFullName() {
+		return firstName + " " + lastName;
+	}
 }
