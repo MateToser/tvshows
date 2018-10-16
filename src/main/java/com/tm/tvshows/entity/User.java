@@ -15,7 +15,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tm.tvshows.common.View;
@@ -39,7 +38,7 @@ public class User implements Serializable {
 
 	}
 
-	public User(@Email String email, String firstName, String lastName, String password) {
+	public User(String email, String firstName, String lastName, String password) {
 		this.email = email;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -51,7 +50,6 @@ public class User implements Serializable {
 	@Id
 	private Integer id;
 
-	@Email
 	@JsonView(View.Public.class)
 	@Column(name = "email", length = 50, nullable = false)
 	private String email;
