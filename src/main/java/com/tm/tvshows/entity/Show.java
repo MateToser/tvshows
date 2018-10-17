@@ -36,7 +36,7 @@ public class Show implements Serializable {
 	 *
 	 */
 	@Transient
-	private static final long serialVersionUID = 8468288151787024438L;
+	private static final long serialVersionUID = -1177306598858303420L;
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -44,7 +44,7 @@ public class Show implements Serializable {
 	private Integer id;
 
 	@JsonView(View.Public.class)
-	@Column(name = "title", length = 50, nullable = false)
+	@Column(name = "title", length = 50, nullable = false, unique = true)
 	private String title;
 
 	@JsonView(View.Public.class)

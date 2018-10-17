@@ -26,14 +26,19 @@ public class ShowServiceImpl implements ShowService {
 
 	@Override
 	public Show getShowFromDatabase(String title) {
-		title = title.replaceAll(" ", "+");
 		Show showResponse = new Show();
 		Optional<Show> showOptional = showRepository.findByTitleContaining(title);
 		if (showOptional.isPresent()) {
 			showResponse = showOptional.get();
 		} else {
 			OmdbResponse omdbResponse = omdbService.getOmdbResponse(title);
-			showResponse = setShow(omdbResponse);
+			showOptional = showRepository.findByTitleContaining(omdbResponse.getTitle());
+			/**
+			 * Ha alapból az omdb api-n keresztül kapott címet adnám meg, akkor lehet, hogy feleslegesen hívok be oda
+			 * ezzel növelve a kérések számát. Így először a user által megadott címmel kérdezek le az adatbázisból, ha
+			 * nem találja a cím alapján, akkor bekérdezek az omdb cím alapján is, mivel ez eltérhet.
+			 */
+			showResponse = showOptional.isPresent() ? showOptional.get() : setShow(omdbResponse);
 		}
 		return showResponse;
 	}
@@ -66,11 +71,12 @@ public class ShowServiceImpl implements ShowService {
 			Optional<Category> categoryOptional = categoryRepository.findByType(category);
 			if (categoryRepository.findByType(category).isPresent()) {
 				categories.add(categoryOptional.get());
+			} else {
+				Category categoryAdd = new Category();
+				categoryAdd.setType(category);
+				categoryRepository.save(categoryAdd);
+				categories.add(categoryAdd);
 			}
-			Category categoryAdd = new Category();
-			categoryAdd.setType(category);
-			categoryRepository.save(categoryAdd);
-			categories.add(categoryAdd);
 		}
 		return categories;
 	}

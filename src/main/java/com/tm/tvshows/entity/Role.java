@@ -31,14 +31,14 @@ public class Role implements Serializable {
 	 *
 	 */
 	@Transient
-	private static final long serialVersionUID = 1493931745533600982L;
+	private static final long serialVersionUID = 7544459121679036640L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length = 30)
+	@Column(length = 30, unique = true)
 	private RoleType type;
 
 }

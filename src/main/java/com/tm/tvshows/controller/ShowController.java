@@ -31,7 +31,7 @@ public class ShowController {
 	@GetMapping(value = "/{title}")
 	@ResponseBody
 	@JsonView(View.Show.class)
-	public ResponseEntity<Show> getOmdbResponse(@PathVariable(value = "title") String title) {
+	public ResponseEntity<Show> getShow(@PathVariable(value = "title") String title) {
 		try {
 			Show showResponse = showService.getShowFromDatabase(title);
 			if (showResponse == null) {

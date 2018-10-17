@@ -32,7 +32,7 @@ public class User implements Serializable {
 	 *
 	 */
 	@Transient
-	private static final long serialVersionUID = -153164493995962273L;
+	private static final long serialVersionUID = 3955409955613511591L;
 
 	public User() {
 
@@ -51,7 +51,7 @@ public class User implements Serializable {
 	private Integer id;
 
 	@JsonView(View.Public.class)
-	@Column(name = "email", length = 50, nullable = false)
+	@Column(name = "email", length = 50, nullable = false, unique = true)
 	private String email;
 
 	@JsonView(View.Public.class)

@@ -41,7 +41,7 @@ public class Category implements Serializable {
 	private Integer id;
 
 	@JsonView(View.Public.class)
-	@Column(name = "type", length = 30, nullable = false)
+	@Column(name = "type", length = 30, nullable = false, unique = true)
 	private String type;
 
 	@JsonView(View.Category.class)
