@@ -23,7 +23,9 @@ public class UserPrincipal implements UserDetails {
 
 	private Integer id;
 
-	private String name;
+	private String firstName;
+
+	private String lastName;
 
 	@JsonIgnore
 	private String email;
@@ -37,7 +39,8 @@ public class UserPrincipal implements UserDetails {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getType().name())).collect(Collectors.toList());
 
-		return new UserPrincipal(user.getId(), user.getFullName(), user.getEmail(), user.getPassword(), authorities);
+		return new UserPrincipal(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
+				user.getPassword(), authorities);
 	}
 
 	@Override

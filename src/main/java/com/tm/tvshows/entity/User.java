@@ -45,6 +45,14 @@ public class User implements Serializable {
 		this.password = password;
 	}
 
+	public User(UserPrincipal currentUser) {
+		id = currentUser.getId();
+		email = currentUser.getEmail();
+		firstName = currentUser.getFirstName();
+		lastName = currentUser.getLastName();
+		password = currentUser.getPassword();
+	}
+
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	@Id
