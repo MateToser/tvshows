@@ -4,6 +4,10 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.tm.tvshows.entity.Category;
@@ -100,6 +104,25 @@ public class ShowServiceImpl implements ShowService {
 		}
 		// TODO: dobjon konkret exceptiont
 		throw new Exception("Ezzel az id-val nincs sorozat!");
+	}
+
+	@Override
+	public Page<Show> getOrderedShows(String order, Integer page, Integer count) {
+		Page<Show> show = null;
+		if (order.toLowerCase().equals("abc_asc")) {
+			Pageable pageable = PageRequest.of(page, count, Sort.by("title").ascending());
+			show = showRepository.findAll(pageable);
+		} else if (order.toLowerCase().equals("abc_desc")) {
+			Pageable pageable = PageRequest.of(page, count, Sort.by("title").descending());
+			show = showRepository.findAll(pageable);
+		} else if (order.toLowerCase().equals("date_asc")) {
+			Pageable pageable = PageRequest.of(page, count, Sort.by("id").ascending());
+			show = showRepository.findAll(pageable);
+		} else if (order.toLowerCase().equals("date_desc")) {
+			Pageable pageable = PageRequest.of(page, count, Sort.by("id").descending());
+			show = showRepository.findAll(pageable);
+		}
+		return show;
 	}
 
 }

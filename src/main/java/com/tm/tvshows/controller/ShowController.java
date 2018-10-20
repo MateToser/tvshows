@@ -1,9 +1,12 @@
 package com.tm.tvshows.controller;
 
+import java.util.List;
+
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,6 +72,26 @@ public class ShowController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (NotFoundException e) {
 			log.error("Nem sikerült a sorozat kedvelése: {}", "/api/show/like/" + id);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@GetMapping(value = "/{order}/{page}/{count}")
+	@ResponseBody
+	@JsonView(View.Show.class)
+	public ResponseEntity<List<Show>> getOrderedShows(@PathVariable(value = "order") String order,
+			@PathVariable(value = "page") Integer page, @PathVariable(value = "count") Integer count) {
+		try {
+			Page<Show> shows = showService.getOrderedShows(order, page, count);
+			return ResponseEntity.ok(shows.getContent());
+		} catch (InternalServerErrorException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page, count);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (BadRequestException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page, count);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (NotFoundException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page, count);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

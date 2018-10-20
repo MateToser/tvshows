@@ -59,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
 				.antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html",
 						"/**/*.css", "/**/*.js")
-				.permitAll().antMatchers("/api/auth/**").permitAll().antMatchers("/api/show/**").authenticated()
+				.permitAll().antMatchers("/api/auth/**").permitAll().antMatchers("/api/show/**").permitAll()
 				.antMatchers("/api/user/checkEmailAvailability").permitAll().anyRequest().authenticated()
 				.antMatchers(AUTH_WHITELIST).permitAll().anyRequest().anonymous();
 
