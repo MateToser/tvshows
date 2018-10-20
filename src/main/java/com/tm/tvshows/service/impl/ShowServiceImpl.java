@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.tm.tvshows.entity.Category;
 import com.tm.tvshows.entity.OmdbResponse;
 import com.tm.tvshows.entity.Show;
+import com.tm.tvshows.entity.User;
+import com.tm.tvshows.entity.UserPrincipal;
 import com.tm.tvshows.repository.CategoryRepository;
 import com.tm.tvshows.repository.ShowRepository;
 import com.tm.tvshows.service.api.OmdbService;
@@ -79,6 +81,25 @@ public class ShowServiceImpl implements ShowService {
 			}
 		}
 		return categories;
+	}
+
+	@Override
+	public Boolean likeShow(Integer id, UserPrincipal currentUser) throws Exception {
+		Optional<Show> show = showRepository.findById(id);
+		if (show.isPresent()) {
+			if (show.get().getUsers() != null) {
+				if (show.get().getUsers().stream().anyMatch(u -> currentUser.getId().equals(u.getId()))) {
+					return false;
+				}
+			}
+			User user = new User(currentUser);
+			show.get().setUsers(new HashSet<>());
+			show.get().getUsers().add(user);
+			showRepository.save(show.get());
+			return true;
+		}
+		// TODO: dobjon konkret exceptiont
+		throw new Exception("Ezzel az id-val nincs sorozat!");
 	}
 
 }

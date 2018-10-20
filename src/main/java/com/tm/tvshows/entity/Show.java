@@ -38,6 +38,7 @@ public class Show implements Serializable {
 	@Transient
 	private static final long serialVersionUID = -1177306598858303420L;
 
+	@JsonView(View.Public.class)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	@Id
