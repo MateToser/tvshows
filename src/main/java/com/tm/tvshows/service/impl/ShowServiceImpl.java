@@ -1,6 +1,7 @@
 package com.tm.tvshows.service.impl;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -123,6 +124,12 @@ public class ShowServiceImpl implements ShowService {
 			show = showRepository.findAll(pageable);
 		}
 		return show;
+	}
+
+	@Override
+	public List<Show> getAllShows() {
+		List<Show> shows = (List<Show>) showRepository.findAll();
+		return shows;
 	}
 
 }
