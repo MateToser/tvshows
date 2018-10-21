@@ -28,7 +28,7 @@ public class UserController {
 
 	@GetMapping(value = "/me")
 	@ResponseBody
-	@JsonView(View.Show.class)
+	@JsonView(View.User.class)
 	public ResponseEntity<User> getCurrentUser(@CurrentUser UserPrincipal currentUser) {
 		try {
 			User user = new User(currentUser);

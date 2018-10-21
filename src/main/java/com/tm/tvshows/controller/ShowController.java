@@ -57,6 +57,29 @@ public class ShowController {
 		}
 	}
 
+	@GetMapping(value = "/all")
+	@ResponseBody
+	@JsonView(View.Show.class)
+	public ResponseEntity<List<Show>> getAllShow() {
+		try {
+			List<Show> showsResponse = showService.getAllShows();
+			if (showsResponse == null) {
+				log.error("Nincsenek sorozatok: {}", "/api/show/");
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			return ResponseEntity.ok(showsResponse);
+		} catch (InternalServerErrorException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: {}", "/api/show/all");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (BadRequestException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: {}", "/api/show/all");
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (NotFoundException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: {}", "/api/show/all");
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
 	@PostMapping(value = "/like/{id}")
 	@ResponseBody
 	public ResponseEntity<Boolean> likeShow(@CurrentUser UserPrincipal currentUser,
