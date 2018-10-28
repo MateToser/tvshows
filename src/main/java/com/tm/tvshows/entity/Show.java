@@ -57,7 +57,7 @@ public class Show implements Serializable {
 	private String released;
 
 	@JsonView(View.Public.class)
-	@Column(name = "writer", length = 30, nullable = false)
+	@Column(name = "writer", length = 255, nullable = false)
 	private String writer;
 
 	@JsonView(View.Public.class)
