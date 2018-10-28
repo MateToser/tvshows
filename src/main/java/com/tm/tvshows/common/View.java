@@ -22,4 +22,8 @@ public interface View {
 
 	}
 
+	public static class Profile extends User {
+
+	}
+
 }

@@ -53,6 +53,7 @@ public class User implements Serializable {
 		password = currentUser.getPassword();
 	}
 
+	@JsonView(View.Public.class)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	@Id
@@ -78,7 +79,7 @@ public class User implements Serializable {
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private Set<Role> roles;
 
-	@JsonView(View.User.class)
+	@JsonView({ View.User.class, View.Profile.class })
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
 	private Set<Show> shows;
 

@@ -1,5 +1,6 @@
 package com.tm.tvshows.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import com.tm.tvshows.entity.User;
 import com.tm.tvshows.entity.UserPrincipal;
 import com.tm.tvshows.repository.CategoryRepository;
 import com.tm.tvshows.repository.ShowRepository;
+import com.tm.tvshows.response.ShowResponse;
 import com.tm.tvshows.service.api.OmdbService;
 import com.tm.tvshows.service.api.ShowService;
 
@@ -94,6 +96,9 @@ public class ShowServiceImpl implements ShowService {
 		if (show.isPresent()) {
 			if (show.get().getUsers() != null) {
 				if (show.get().getUsers().stream().anyMatch(u -> currentUser.getId().equals(u.getId()))) {
+					User user = new User(currentUser);
+					show.get().getUsers().remove(user);
+					showRepository.save(show.get());
 					return false;
 				}
 			}
@@ -108,7 +113,7 @@ public class ShowServiceImpl implements ShowService {
 	}
 
 	@Override
-	public Page<Show> getOrderedShows(String order, Integer page, Integer count) {
+	public Page<Show> getOrderedShows(String order, Integer page, Integer count, UserPrincipal currentUser) {
 		Page<Show> show = null;
 		if (order.toLowerCase().equals("abc_asc")) {
 			Pageable pageable = PageRequest.of(page, count, Sort.by("title").ascending());
@@ -127,9 +132,19 @@ public class ShowServiceImpl implements ShowService {
 	}
 
 	@Override
-	public List<Show> getAllShows() {
+	public List<ShowResponse> getAllShows(UserPrincipal currentUser) {
 		List<Show> shows = (List<Show>) showRepository.findAll();
-		return shows;
+		List<ShowResponse> response = new ArrayList<>();
+		for (Show show : shows) {
+			ShowResponse showResponse = new ShowResponse(show);
+			if (show.getUsers().stream().anyMatch(u -> currentUser.getId().equals(u.getId()))) {
+				showResponse.setIsLiked(true);
+			} else {
+				showResponse.setIsLiked(false);
+			}
+			response.add(showResponse);
+		}
+		return response;
 	}
 
 }

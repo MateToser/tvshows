@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 
 import com.tm.tvshows.entity.Show;
 import com.tm.tvshows.entity.UserPrincipal;
+import com.tm.tvshows.response.ShowResponse;
 
 public interface ShowService {
 
@@ -13,8 +14,8 @@ public interface ShowService {
 
 	Boolean likeShow(Integer id, UserPrincipal currentUser) throws Exception;
 
-	Page<Show> getOrderedShows(String order, Integer page, Integer count);
+	Page<Show> getOrderedShows(String order, Integer page, Integer count, UserPrincipal currentUser);
 
-	List<Show> getAllShows();
+	List<ShowResponse> getAllShows(UserPrincipal currentUser);
 
 }
