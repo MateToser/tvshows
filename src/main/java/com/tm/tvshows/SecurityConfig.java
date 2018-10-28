@@ -31,13 +31,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			// -- swagger ui
 			"/swagger-resources/**", "/swagger-ui.html", "/v2/api-docs", "/webjars/**",
 			// --auth api
-			"/api/auth/**", "/api/user/**", "/api/show/**",
+			"/api/auth/**",
 			// static
 			"/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css",
 			"/**/*.js" };
 	private static final String[] AUTH_AUTHENTICATED = {
 			// -- show api
-			"/api/user/checkEmailAvailability" };
+			"/api/user/checkEmailAvailability", "/api/user/**", "/api/show/**" };
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -65,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
 				.antMatchers(AUTH_ANONYMOUS).permitAll().anyRequest().anonymous().antMatchers(AUTH_AUTHENTICATED)
-				.authenticated();
+				.permitAll().anyRequest().authenticated();
 
 		// Add our custom JWT security filter
 		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

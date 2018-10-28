@@ -21,6 +21,7 @@ import com.tm.tvshows.common.View;
 import com.tm.tvshows.entity.CurrentUser;
 import com.tm.tvshows.entity.Show;
 import com.tm.tvshows.entity.UserPrincipal;
+import com.tm.tvshows.response.ShowResponse;
 import com.tm.tvshows.service.api.ShowService;
 
 import lombok.RequiredArgsConstructor;
@@ -60,9 +61,9 @@ public class ShowController {
 	@GetMapping(value = "/all")
 	@ResponseBody
 	@JsonView(View.Show.class)
-	public ResponseEntity<List<Show>> getAllShow() {
+	public ResponseEntity<List<ShowResponse>> getAllShow(@CurrentUser UserPrincipal currentUser) {
 		try {
-			List<Show> showsResponse = showService.getAllShows();
+			List<ShowResponse> showsResponse = showService.getAllShows(currentUser);
 			if (showsResponse == null) {
 				log.error("Nincsenek sorozatok: {}", "/api/show/");
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -102,10 +103,11 @@ public class ShowController {
 	@GetMapping(value = "/{order}/{page}/{count}")
 	@ResponseBody
 	@JsonView(View.Show.class)
-	public ResponseEntity<List<Show>> getOrderedShows(@PathVariable(value = "order") String order,
-			@PathVariable(value = "page") Integer page, @PathVariable(value = "count") Integer count) {
+	public ResponseEntity<List<Show>> getOrderedShows(@CurrentUser UserPrincipal currentUser,
+			@PathVariable(value = "order") String order, @PathVariable(value = "page") Integer page,
+			@PathVariable(value = "count") Integer count) {
 		try {
-			Page<Show> shows = showService.getOrderedShows(order, page, count);
+			Page<Show> shows = showService.getOrderedShows(order, page, count, currentUser);
 			return ResponseEntity.ok(shows.getContent());
 		} catch (InternalServerErrorException e) {
 			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page, count);

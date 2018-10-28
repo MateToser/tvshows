@@ -55,6 +55,9 @@ public class OmdbResponse {
 	private String response;
 
 	public Double getImdbRatingInDouble() {
+		if ("N/A".equals(imdbRating)) {
+			return 0.0;
+		}
 		return Double.parseDouble(imdbRating);
 	}
 
