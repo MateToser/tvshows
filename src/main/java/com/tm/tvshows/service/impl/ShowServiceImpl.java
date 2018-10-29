@@ -147,4 +147,19 @@ public class ShowServiceImpl implements ShowService {
 		return response;
 	}
 
+	@Override
+	public ShowResponse getShowById(Integer id, UserPrincipal currentUser) {
+		Optional<Show> showOptional = showRepository.findById(id);
+		if (showOptional.isPresent()) {
+			ShowResponse showResponse = new ShowResponse(showOptional.get());
+			if (showResponse.getShow().getUsers().stream().anyMatch(u -> currentUser.getId().equals(u.getId()))) {
+				showResponse.setIsLiked(true);
+			} else {
+				showResponse.setIsLiked(false);
+			}
+			return showResponse;
+		}
+		return null;
+	}
+
 }

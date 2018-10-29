@@ -58,6 +58,30 @@ public class ShowController {
 		}
 	}
 
+	@GetMapping(value = "/id/{id}")
+	@ResponseBody
+	@JsonView(View.Show.class)
+	public ResponseEntity<ShowResponse> getShowById(@PathVariable(value = "id") Integer id,
+			@CurrentUser UserPrincipal currentUser) {
+		try {
+			ShowResponse showResponse = showService.getShowById(id, currentUser);
+			if (showResponse == null) {
+				log.error("Nincs ilyen sorozat: {}", "/api/show/id/" + id);
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			return ResponseEntity.ok(showResponse);
+		} catch (InternalServerErrorException e) {
+			log.error("Nem sikerült a sorozat lekérdezés: {}", "/api/show/id/" + id);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (BadRequestException e) {
+			log.error("Nem sikerült a sorozat lekérdezés: {}", "/api/show/id/" + id);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (NotFoundException e) {
+			log.error("Nem sikerült a sorozat lekérdezés: {}", "/api/show/id/" + id);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
 	@GetMapping(value = "/all")
 	@ResponseBody
 	@JsonView(View.Show.class)

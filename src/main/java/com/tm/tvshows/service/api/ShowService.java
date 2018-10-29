@@ -12,6 +12,8 @@ public interface ShowService {
 
 	Show getShowFromDatabase(String title);
 
+	ShowResponse getShowById(Integer id, UserPrincipal currentUser);
+
 	Boolean likeShow(Integer id, UserPrincipal currentUser) throws Exception;
 
 	Page<Show> getOrderedShows(String order, Integer page, Integer count, UserPrincipal currentUser);
