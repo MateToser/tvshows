@@ -35,6 +35,7 @@ public class Category implements Serializable {
 	@Transient
 	private static final long serialVersionUID = -5844463911803033472L;
 
+	@JsonView(View.Public.class)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	@Id
