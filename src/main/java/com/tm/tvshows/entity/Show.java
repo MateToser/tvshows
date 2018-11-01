@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -65,8 +66,8 @@ public class Show implements Serializable {
 	private String awards;
 
 	@JsonView(View.Public.class)
-	@Column(name = "seasons", nullable = false)
-	private Long seasons;
+	@Column(name = "totalSeasons", nullable = false)
+	private Long totalSeasons;
 
 	@JsonView(View.Public.class)
 	@Column(name = "imdb_rating", nullable = false)
@@ -87,6 +88,10 @@ public class Show implements Serializable {
 	@JsonView(View.Public.class)
 	@Column(name = "poster_url", length = 2000, nullable = false)
 	private String posterUrl;
+
+	@JsonView(View.Show.class)
+	@OneToMany(mappedBy = "show", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	private Set<Season> seasons;
 
 	@JsonView(View.Show.class)
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)

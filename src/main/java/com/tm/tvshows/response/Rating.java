@@ -1,4 +1,4 @@
-package com.tm.tvshows.entity;
+package com.tm.tvshows.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

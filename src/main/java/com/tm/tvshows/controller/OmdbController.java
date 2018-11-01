@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tm.tvshows.entity.OmdbResponse;
+import com.tm.tvshows.response.OmdbResponse;
 import com.tm.tvshows.service.api.OmdbService;
 
 import lombok.RequiredArgsConstructor;
