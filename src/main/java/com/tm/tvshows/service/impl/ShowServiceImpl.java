@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.ws.rs.BadRequestException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,12 +15,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.tm.tvshows.entity.Category;
-import com.tm.tvshows.entity.OmdbResponse;
 import com.tm.tvshows.entity.Show;
 import com.tm.tvshows.entity.User;
 import com.tm.tvshows.entity.UserPrincipal;
 import com.tm.tvshows.repository.CategoryRepository;
 import com.tm.tvshows.repository.ShowRepository;
+import com.tm.tvshows.response.OmdbResponse;
+import com.tm.tvshows.response.OmdbSeriesResponse;
+import com.tm.tvshows.response.ShowDTO;
 import com.tm.tvshows.response.ShowResponse;
 import com.tm.tvshows.service.api.OmdbService;
 import com.tm.tvshows.service.api.ShowService;
@@ -29,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ShowServiceImpl implements ShowService {
 
+	private static final int SHOWS_COUNT = 10;
 	private final ShowRepository showRepository;
 	private final CategoryRepository categoryRepository;
 	private final OmdbService omdbService;
@@ -40,32 +45,32 @@ public class ShowServiceImpl implements ShowService {
 		if (showOptional.isPresent()) {
 			showResponse = showOptional.get();
 		} else {
-			OmdbResponse omdbResponse = omdbService.getOmdbResponse(title);
-			showOptional = showRepository.findByTitleContaining(omdbResponse.getTitle());
+			OmdbResponse omdbSeriesResponse = omdbService.getOmdbResponse(title);
+			showOptional = showRepository.findByTitleContaining(omdbSeriesResponse.getShow().getTitle());
 			/**
 			 * Ha alapból az omdb api-n keresztül kapott címet adnám meg, akkor lehet, hogy feleslegesen hívok be oda
 			 * ezzel növelve a kérések számát. Így először a user által megadott címmel kérdezek le az adatbázisból, ha
 			 * nem találja a cím alapján, akkor bekérdezek az omdb cím alapján is, mivel ez eltérhet.
 			 */
-			showResponse = showOptional.isPresent() ? showOptional.get() : setShow(omdbResponse);
+			showResponse = showOptional.isPresent() ? showOptional.get() : setShow(omdbSeriesResponse.getShow());
 		}
 		return showResponse;
 	}
 
-	private Show setShow(OmdbResponse omdbResponse) {
+	private Show setShow(OmdbSeriesResponse omdbSeriesResponse) {
 		Show showResponse = new Show();
-		showResponse.setTitle(omdbResponse.getTitle());
-		showResponse.setDescription(omdbResponse.getPlot());
-		showResponse.setReleased(omdbResponse.getReleased());
-		showResponse.setWriter(omdbResponse.getWriter());
-		showResponse.setAwards(omdbResponse.getAwards());
-		showResponse.setImdbRating(omdbResponse.getImdbRatingInDouble());
-		showResponse.setImdbVotes(omdbResponse.getImdbVotes());
-		showResponse.setImdbId(omdbResponse.getImdbID());
+		showResponse.setTitle(omdbSeriesResponse.getTitle());
+		showResponse.setDescription(omdbSeriesResponse.getPlot());
+		showResponse.setReleased(omdbSeriesResponse.getReleased());
+		showResponse.setWriter(omdbSeriesResponse.getWriter());
+		showResponse.setAwards(omdbSeriesResponse.getAwards());
+		showResponse.setImdbRating(omdbSeriesResponse.getImdbRatingInDouble());
+		showResponse.setImdbVotes(omdbSeriesResponse.getImdbVotes());
+		showResponse.setImdbId(omdbSeriesResponse.getImdbID());
 		showResponse.setApproved(false);
-		showResponse.setPosterUrl(omdbResponse.getPoster());
-		showResponse.setSeasons(omdbResponse.getSeasonsInLong());
-		showResponse.setCategories(getCategories(omdbResponse.getGenre()));
+		showResponse.setPosterUrl(omdbSeriesResponse.getPoster());
+		showResponse.setTotalSeasons(omdbSeriesResponse.getSeasonsInLong());
+		showResponse.setCategories(getCategories(omdbSeriesResponse.getGenre()));
 		showResponse.setUsers(null);
 		showRepository.save(showResponse);
 		return showResponse;
@@ -74,7 +79,7 @@ public class ShowServiceImpl implements ShowService {
 	// TODO: bekérdez repoba, hogy létezik-e már a kategória, ha nem elmenti és hozzáadja a set-hez, ha igen akkor csak
 	// hozzáadja a sethez
 	private Set<Category> getCategories(String categoriesInString) {
-		Set<Category> categories = new HashSet();
+		Set<Category> categories = new HashSet<>();
 		String[] categoryArray = categoriesInString.split(",\\s+");
 		for (String category : categoryArray) {
 			Optional<Category> categoryOptional = categoryRepository.findByType(category);
@@ -108,27 +113,39 @@ public class ShowServiceImpl implements ShowService {
 			showRepository.save(show.get());
 			return true;
 		}
-		// TODO: dobjon konkret exceptiont
-		throw new Exception("Ezzel az id-val nincs sorozat!");
+		throw new BadRequestException("Ezzel az id-val nincs sorozat!");
 	}
 
 	@Override
-	public Page<Show> getOrderedShows(String order, Integer page, Integer count, UserPrincipal currentUser) {
+	public ShowDTO getOrderedShows(String order, Integer page, UserPrincipal currentUser) {
+		ShowDTO showDTO = new ShowDTO();
+		List<ShowResponse> showResponses = new ArrayList<>();
 		Page<Show> show = null;
 		if (order.toLowerCase().equals("abc_asc")) {
-			Pageable pageable = PageRequest.of(page, count, Sort.by("title").ascending());
+			Pageable pageable = PageRequest.of(page, SHOWS_COUNT, Sort.by("title").ascending());
 			show = showRepository.findAll(pageable);
 		} else if (order.toLowerCase().equals("abc_desc")) {
-			Pageable pageable = PageRequest.of(page, count, Sort.by("title").descending());
+			Pageable pageable = PageRequest.of(page, SHOWS_COUNT, Sort.by("title").descending());
 			show = showRepository.findAll(pageable);
 		} else if (order.toLowerCase().equals("date_asc")) {
-			Pageable pageable = PageRequest.of(page, count, Sort.by("id").ascending());
+			Pageable pageable = PageRequest.of(page, SHOWS_COUNT, Sort.by("id").ascending());
 			show = showRepository.findAll(pageable);
 		} else if (order.toLowerCase().equals("date_desc")) {
-			Pageable pageable = PageRequest.of(page, count, Sort.by("id").descending());
+			Pageable pageable = PageRequest.of(page, SHOWS_COUNT, Sort.by("id").descending());
 			show = showRepository.findAll(pageable);
 		}
-		return show;
+		for (Show item : show) {
+			ShowResponse showAdd = new ShowResponse(item);
+			if (item.getUsers().stream().anyMatch(u -> currentUser.getId().equals(u.getId()))) {
+				showAdd.setIsLiked(true);
+			} else {
+				showAdd.setIsLiked(false);
+			}
+			showResponses.add(showAdd);
+		}
+		showDTO.setShows(showResponses);
+		showDTO.setTotalPage(show.getTotalPages());
+		return showDTO;
 	}
 
 	@Override

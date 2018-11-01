@@ -1,4 +1,4 @@
-package com.tm.tvshows.entity;
+package com.tm.tvshows.response;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class OmdbResponse {
+public class OmdbSeriesResponse {
 
 	@JsonProperty("Title")
 	private String title;

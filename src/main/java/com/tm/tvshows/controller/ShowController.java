@@ -6,7 +6,6 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +20,7 @@ import com.tm.tvshows.common.View;
 import com.tm.tvshows.entity.CurrentUser;
 import com.tm.tvshows.entity.Show;
 import com.tm.tvshows.entity.UserPrincipal;
+import com.tm.tvshows.response.ShowDTO;
 import com.tm.tvshows.response.ShowResponse;
 import com.tm.tvshows.service.api.ShowService;
 
@@ -124,23 +124,22 @@ public class ShowController {
 		}
 	}
 
-	@GetMapping(value = "/{order}/{page}/{count}")
+	@GetMapping(value = "/{order}/{page}")
 	@ResponseBody
 	@JsonView(View.Show.class)
-	public ResponseEntity<List<Show>> getOrderedShows(@CurrentUser UserPrincipal currentUser,
-			@PathVariable(value = "order") String order, @PathVariable(value = "page") Integer page,
-			@PathVariable(value = "count") Integer count) {
+	public ResponseEntity<ShowDTO> getOrderedShows(@CurrentUser UserPrincipal currentUser,
+			@PathVariable(value = "order") String order, @PathVariable(value = "page") Integer page) {
 		try {
-			Page<Show> shows = showService.getOrderedShows(order, page, count, currentUser);
-			return ResponseEntity.ok(shows.getContent());
+			ShowDTO shows = showService.getOrderedShows(order, page, currentUser);
+			return ResponseEntity.ok(shows);
 		} catch (InternalServerErrorException e) {
-			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page, count);
+			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (BadRequestException e) {
-			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page, count);
+			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (NotFoundException e) {
-			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page, count);
+			log.error("Nem sikerült a sorozatok lekérdezés: /api/show/{}/{}/{}", order, page);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
