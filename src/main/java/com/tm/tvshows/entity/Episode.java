@@ -1,7 +1,9 @@
 package com.tm.tvshows.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -23,7 +27,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "season")
+@Table(name = "episode")
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -46,10 +50,6 @@ public class Episode implements Serializable {
 	private String title;
 
 	@JsonView(View.Public.class)
-	@Column(name = "year", nullable = false)
-	private String year;
-
-	@JsonView(View.Public.class)
 	@Column(name = "released", nullable = false)
 	private String released;
 
@@ -58,31 +58,21 @@ public class Episode implements Serializable {
 	private String episode;
 
 	@JsonView(View.Public.class)
-	@Column(name = "runtime", nullable = false)
-	private String runtime;
-
-	@JsonView(View.Public.class)
-	@Column(name = "plot", nullable = false)
-	private String plot;
-
-	@JsonView(View.Public.class)
-	@Column(name = "poster", nullable = false)
-	private String poster;
-
-	@JsonView(View.Public.class)
 	@Column(name = "imdbRating", nullable = false)
 	private String imdbRating;
-
-	@JsonView(View.Public.class)
-	@Column(name = "imdbVotes", nullable = false)
-	private String imdbVotes;
 
 	@JsonView(View.Public.class)
 	@Column(name = "imdbId", nullable = false)
 	private String imdbId;
 
+	@JsonView(View.Episode.class)
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "season_id")
 	private Season season;
+
+	@JsonView(View.Episode.class)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	@JoinTable(name = "episode_user", joinColumns = @JoinColumn(name = "episode_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+	private Set<User> users;
 
 }

@@ -3,6 +3,7 @@ package com.tm.tvshows.entity;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -82,6 +84,13 @@ public class User implements Serializable {
 	@JsonView({ View.User.class, View.Profile.class })
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
 	private Set<Show> shows;
+
+	@JsonView(View.Profile.class)
+	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
+	private Set<Episode> episodes;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	private Set<Comment> comments;
 
 	public String getFullName() {
 		return firstName + " " + lastName;

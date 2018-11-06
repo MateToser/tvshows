@@ -1,5 +1,6 @@
 package com.tm.tvshows.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.BadRequestException;
@@ -18,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tm.tvshows.common.View;
 import com.tm.tvshows.entity.CurrentUser;
-import com.tm.tvshows.entity.Show;
 import com.tm.tvshows.entity.UserPrincipal;
+import com.tm.tvshows.response.SearchResponse;
 import com.tm.tvshows.response.ShowDTO;
 import com.tm.tvshows.response.ShowResponse;
 import com.tm.tvshows.service.api.ShowService;
@@ -35,25 +36,25 @@ public class ShowController {
 
 	private final ShowService showService;
 
-	@GetMapping(value = "/{title}")
+	@PostMapping(value = "/{title}")
 	@ResponseBody
 	@JsonView(View.Show.class)
-	public ResponseEntity<Show> getShow(@PathVariable(value = "title") String title) {
+	public ResponseEntity<Integer> addShow(@PathVariable(value = "title") String title) {
 		try {
-			Show showResponse = showService.getShowFromDatabase(title);
-			if (showResponse == null) {
+			Integer showId = showService.addShowToDatabase(title);
+			if (showId == null) {
 				log.error("Nincs ilyen sorozat: {}", "/api/show/" + title);
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
-			return ResponseEntity.ok(showResponse);
+			return ResponseEntity.ok(showId);
 		} catch (InternalServerErrorException e) {
-			log.error("Nem sikerült a sorozat lekérdezés: {}", "/api/show/" + title);
+			log.error("Nem sikerült a sorozat hozzáadása: {}", "/api/show/" + title);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (BadRequestException e) {
-			log.error("Nem sikerült a sorozat lekérdezés: {}", "/api/show/" + title);
+			log.error("Nem sikerült a sorozat hozzáadása: {}", "/api/show/" + title);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (NotFoundException e) {
-			log.error("Nem sikerült a sorozat lekérdezés: {}", "/api/show/" + title);
+			log.error("Nem sikerült a sorozat hozzáadása: {}", "/api/show/" + title);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
@@ -89,7 +90,7 @@ public class ShowController {
 		try {
 			List<ShowResponse> showsResponse = showService.getAllShows(currentUser);
 			if (showsResponse == null) {
-				log.error("Nincsenek sorozatok: {}", "/api/show/");
+				log.error("Nincsenek sorozatok: {}", "/api/show/all");
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 			return ResponseEntity.ok(showsResponse);
@@ -101,6 +102,25 @@ public class ShowController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (NotFoundException e) {
 			log.error("Nem sikerült a sorozatok lekérdezés: {}", "/api/show/all");
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@GetMapping(value = "/search/{title}")
+	@ResponseBody
+	public ResponseEntity<List<SearchResponse>> searchShows(@PathVariable(value = "title") String title) {
+		try {
+			List<SearchResponse> showsResponse = new ArrayList<>();
+			showsResponse = showService.searchShows(title);
+			return ResponseEntity.ok(showsResponse);
+		} catch (InternalServerErrorException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: {}", "/api/show/search");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (BadRequestException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: {}", "/api/show/search");
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (NotFoundException e) {
+			log.error("Nem sikerült a sorozatok lekérdezés: {}", "/api/show/search");
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

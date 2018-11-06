@@ -26,4 +26,12 @@ public interface View {
 
 	}
 
+	public static class Episode extends Public {
+
+	}
+
+	public static class Comment extends Public {
+
+	}
+
 }

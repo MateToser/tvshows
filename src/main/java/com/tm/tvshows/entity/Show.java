@@ -82,10 +82,6 @@ public class Show implements Serializable {
 	private String imdbId;
 
 	@JsonView(View.Public.class)
-	@Column(name = "approved", columnDefinition = "TINYINT DEFAULT 0")
-	private Boolean approved;
-
-	@JsonView(View.Public.class)
 	@Column(name = "poster_url", length = 2000, nullable = false)
 	private String posterUrl;
 
@@ -102,4 +98,7 @@ public class Show implements Serializable {
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinTable(name = "show_category", joinColumns = @JoinColumn(name = "show_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
 	private Set<Category> categories;
+
+	@OneToMany(mappedBy = "show", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	private Set<Comment> comments;
 }
