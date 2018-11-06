@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.ws.rs.BadRequestException;
 
+import org.apache.commons.math3.util.Precision;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,12 +27,15 @@ import com.tm.tvshows.repository.CommentRepository;
 import com.tm.tvshows.repository.EpisodeRepository;
 import com.tm.tvshows.repository.SeasonRepository;
 import com.tm.tvshows.repository.ShowRepository;
+import com.tm.tvshows.response.EpisodeResponse;
 import com.tm.tvshows.response.OmdbEpisode;
 import com.tm.tvshows.response.OmdbResponse;
 import com.tm.tvshows.response.OmdbSeasonResponse;
 import com.tm.tvshows.response.SearchResponse;
+import com.tm.tvshows.response.SeasonResponse;
 import com.tm.tvshows.response.ShowDTO;
 import com.tm.tvshows.response.ShowResponse;
+import com.tm.tvshows.response.SingleShowPageResponse;
 import com.tm.tvshows.service.api.OmdbService;
 import com.tm.tvshows.service.api.ShowService;
 
@@ -235,18 +239,20 @@ public class ShowServiceImpl implements ShowService {
 	}
 
 	@Override
-	public ShowResponse getShowById(Integer id, UserPrincipal currentUser) {
+	public SingleShowPageResponse getShowById(Integer id, UserPrincipal currentUser) {
 		Optional<Show> showOptional = showRepository.findById(id);
 		List<Comment> comments = commentRepository.findByShowIdOrderByDateAsc(id);
+
 		if (showOptional.isPresent()) {
-			ShowResponse showResponse = new ShowResponse(showOptional.get());
-			showResponse.setComments(comments);
-			if (showResponse.getShow().getUsers().stream().anyMatch(u -> currentUser.getId().equals(u.getId()))) {
-				showResponse.setIsLiked(true);
+			SingleShowPageResponse response = new SingleShowPageResponse(showOptional.get());
+			response.setComments(comments);
+			if (response.getShow().getUsers().stream().anyMatch(u -> currentUser.getId().equals(u.getId()))) {
+				response.setIsLiked(true);
 			} else {
-				showResponse.setIsLiked(false);
+				response.setIsLiked(false);
 			}
-			return showResponse;
+			response.setSeasons(setSeasons(response.getShow().getId(), currentUser.getId()));
+			return response;
 		}
 		return null;
 	}
@@ -261,6 +267,42 @@ public class ShowServiceImpl implements ShowService {
 			searchResponse.setShowId(show.getId());
 			searchResponse.setShowTitle(show.getTitle());
 			response.add(searchResponse);
+		}
+		return response;
+	}
+
+	private List<SeasonResponse> setSeasons(Integer showId, Integer userId) {
+		List<SeasonResponse> response = new ArrayList<>();
+		List<Season> seasons = seasonRepository.findAllByShowId(showId);
+		for (Season season : seasons) {
+			SeasonResponse seasonResponse = new SeasonResponse(season);
+			seasonResponse.setEpisodes(setEpisodes(season.getId(), userId));
+			Double count = 0.0;
+			for (EpisodeResponse episode : seasonResponse.getEpisodes()) {
+				if (episode.getIsWatched()) {
+					count += 1.0;
+				}
+			}
+			if (season.getEpisodes().size() != 0 && count != 0) {
+				count = count / season.getEpisodes().size() * 100;
+			}
+			seasonResponse.setPercent(Precision.round(count, 2));
+			response.add(seasonResponse);
+		}
+		return response;
+	}
+
+	private List<EpisodeResponse> setEpisodes(Integer seasonId, Integer userId) {
+		List<EpisodeResponse> response = new ArrayList<>();
+		List<Episode> episodes = episodeRepository.findAllBySeasonId(seasonId);
+		for (Episode episode : episodes) {
+			EpisodeResponse episodeResponse = new EpisodeResponse(episode);
+			if (episode.getUsers().stream().anyMatch(u -> userId.equals(u.getId()))) {
+				episodeResponse.setIsWatched(true);
+			} else {
+				episodeResponse.setIsWatched(false);
+			}
+			response.add(episodeResponse);
 		}
 		return response;
 	}

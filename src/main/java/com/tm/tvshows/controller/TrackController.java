@@ -32,7 +32,7 @@ public class TrackController {
 	@Autowired
 	private EpisodeService episodeService;
 
-	@PostMapping(value = "/{episodeId}")
+	@PostMapping(value = "/episode/{episodeId}")
 	@ResponseBody
 	@JsonView(View.Episode.class)
 	public ResponseEntity<Episode> trackEpisode(@PathVariable(value = "episodeId") Integer episodeId,
@@ -40,18 +40,42 @@ public class TrackController {
 		try {
 			Episode episodeResponse = episodeService.trackEpisode(episodeId, currentUser);
 			if (episodeResponse == null) {
-				log.error("Nincs ilyen epizód: {}", "/api/track/" + episodeId);
+				log.error("Nincs ilyen epizód: {}", "/api/track/episode/" + episodeId);
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 			return ResponseEntity.ok(episodeResponse);
 		} catch (InternalServerErrorException e) {
-			log.error("Nem sikerült az epizód lekérdezés: {}", "/api/track/" + episodeId);
+			log.error("Nem sikerült az epizód lekérdezés: {}", "/api/track/episode/" + episodeId);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (BadRequestException e) {
-			log.error("Nem sikerült az epizód lekérdezés: {}", "/api/track/" + episodeId);
+			log.error("Nem sikerült az epizód lekérdezés: {}", "/api/track/episode/" + episodeId);
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch (NotFoundException e) {
-			log.error("Nem sikerült az epizód lekérdezés: {}", "/api/track/" + episodeId);
+			log.error("Nem sikerült az epizód lekérdezés: {}", "/api/track/episode/" + episodeId);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@PostMapping(value = "/season/{seasonId}")
+	@ResponseBody
+	@JsonView(View.Episode.class)
+	public ResponseEntity<Boolean> trackSeason(@PathVariable(value = "seasonId") Integer seasonId,
+			@CurrentUser UserPrincipal currentUser) {
+		try {
+			Boolean seasonResponse = episodeService.trackSeason(seasonId, currentUser);
+			if (seasonResponse == null) {
+				log.error("Nincs ilyen évad: {}", "/api/track/season/" + seasonId);
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			return ResponseEntity.ok(seasonResponse);
+		} catch (InternalServerErrorException e) {
+			log.error("Nem sikerült az évad lekérdezés: {}", "/api/track/season/" + seasonId);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (BadRequestException e) {
+			log.error("Nem sikerült az évad lekérdezés: {}", "/api/track/season/" + seasonId);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (NotFoundException e) {
+			log.error("Nem sikerült az évad lekérdezés: {}", "/api/track/season/" + seasonId);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

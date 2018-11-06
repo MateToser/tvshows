@@ -85,7 +85,6 @@ public class Show implements Serializable {
 	@Column(name = "poster_url", length = 2000, nullable = false)
 	private String posterUrl;
 
-	@JsonView(View.Show.class)
 	@OneToMany(mappedBy = "show", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	private Set<Season> seasons;
 
