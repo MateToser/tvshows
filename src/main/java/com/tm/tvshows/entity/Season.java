@@ -48,7 +48,6 @@ public class Season implements Serializable {
 	@Column(name = "season", nullable = false)
 	private String season;
 
-	@JsonView(View.Show.class)
 	@OneToMany(mappedBy = "season", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	private Set<Episode> episodes;
 

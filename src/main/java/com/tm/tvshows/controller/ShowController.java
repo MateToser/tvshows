@@ -23,6 +23,7 @@ import com.tm.tvshows.entity.UserPrincipal;
 import com.tm.tvshows.response.SearchResponse;
 import com.tm.tvshows.response.ShowDTO;
 import com.tm.tvshows.response.ShowResponse;
+import com.tm.tvshows.response.SingleShowPageResponse;
 import com.tm.tvshows.service.api.ShowService;
 
 import lombok.RequiredArgsConstructor;
@@ -62,10 +63,10 @@ public class ShowController {
 	@GetMapping(value = "/id/{id}")
 	@ResponseBody
 	@JsonView(View.Show.class)
-	public ResponseEntity<ShowResponse> getShowById(@PathVariable(value = "id") Integer id,
+	public ResponseEntity<SingleShowPageResponse> getShowById(@PathVariable(value = "id") Integer id,
 			@CurrentUser UserPrincipal currentUser) {
 		try {
-			ShowResponse showResponse = showService.getShowById(id, currentUser);
+			SingleShowPageResponse showResponse = showService.getShowById(id, currentUser);
 			if (showResponse == null) {
 				log.error("Nincs ilyen sorozat: {}", "/api/show/id/" + id);
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

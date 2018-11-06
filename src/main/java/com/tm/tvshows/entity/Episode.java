@@ -65,7 +65,6 @@ public class Episode implements Serializable {
 	@Column(name = "imdbId", nullable = false)
 	private String imdbId;
 
-	@JsonView(View.Episode.class)
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "season_id")
 	private Season season;

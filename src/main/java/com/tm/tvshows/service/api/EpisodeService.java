@@ -7,4 +7,6 @@ public interface EpisodeService {
 
 	Episode trackEpisode(Integer episodeId, UserPrincipal currentUser);
 
+	Boolean trackSeason(Integer seasonId, UserPrincipal currentUser);
+
 }
