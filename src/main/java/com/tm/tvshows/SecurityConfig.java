@@ -31,13 +31,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			// -- swagger ui
 			"/swagger-resources/**", "/swagger-ui.html", "/v2/api-docs", "/webjars/**",
 			// --auth api
-			"/api/auth/**",
+			"/api/auth/**", "/api/user/checkEmailAvailability",
 			// static
 			"/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css",
 			"/**/*.js" };
 	private static final String[] AUTH_AUTHENTICATED = {
 			// -- show api
-			"/api/user/checkEmailAvailability", "/api/user/**", "/api/show/**" };
+			"/api/user/**", "/api/show/**", "/api/track/**", "/api/comment/**" };
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() {

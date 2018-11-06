@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.tm.tvshows.response.OmdbEpisode;
-import com.tm.tvshows.response.OmdbEpisodeResponse;
 import com.tm.tvshows.response.OmdbResponse;
 import com.tm.tvshows.response.OmdbSeasonResponse;
 import com.tm.tvshows.response.OmdbSeriesResponse;
@@ -69,25 +68,21 @@ public class OmdbServiceImpl implements OmdbService {
 					omdbSeasonResponse.getEpisodes().remove(notReleasedEpisode);
 				}
 			}
-			omdbSeasonResponse.setDetailedEpisodes(
-					getOmdbEpisodeResponse(showId, i + 1, omdbSeasonResponse.getEpisodes().size()));
 			omdbSeasonResponseList.add(omdbSeasonResponse);
 		}
 
 		return omdbSeasonResponseList;
 	}
 
-	private List<OmdbEpisodeResponse> getOmdbEpisodeResponse(String showId, Integer season, Integer totalEpisodes) {
-		List<OmdbEpisodeResponse> omdbEpisodeResponseList = new ArrayList<>();
-		for (int i = 0; i < totalEpisodes; i++) {
-			final String uri = API_URL + API_BYID + showId + API_SEASON + season + API_EPISODE + (i + 1) + API_KEY;
-			OmdbEpisodeResponse omdbEpisodeResponse = new OmdbEpisodeResponse();
-			RestTemplate restTemplate = new RestTemplate();
-			omdbEpisodeResponse = restTemplate.getForObject(uri, OmdbEpisodeResponse.class);
-			omdbEpisodeResponseList.add(omdbEpisodeResponse);
-		}
-
-		return omdbEpisodeResponseList;
-	}
+	/*
+	 * private List<OmdbEpisodeResponse> getOmdbEpisodeResponse(String showId, Integer season, Integer totalEpisodes) {
+	 * List<OmdbEpisodeResponse> omdbEpisodeResponseList = new ArrayList<>(); for (int i = 0; i < totalEpisodes; i++) {
+	 * final String uri = API_URL + API_BYID + showId + API_SEASON + season + API_EPISODE + (i + 1) + API_KEY;
+	 * OmdbEpisodeResponse omdbEpisodeResponse = new OmdbEpisodeResponse(); RestTemplate restTemplate = new
+	 * RestTemplate(); omdbEpisodeResponse = restTemplate.getForObject(uri, OmdbEpisodeResponse.class);
+	 * omdbEpisodeResponseList.add(omdbEpisodeResponse); }
+	 * 
+	 * return omdbEpisodeResponseList; }
+	 */
 
 }

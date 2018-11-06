@@ -20,6 +20,4 @@ public class OmdbSeasonResponse {
 	private List<OmdbEpisode> episodes;
 	@JsonProperty("Response")
 	private String response;
-
-	private List<OmdbEpisodeResponse> detailedEpisodes;
 }
